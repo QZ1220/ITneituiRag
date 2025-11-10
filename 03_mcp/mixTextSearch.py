@@ -101,11 +101,10 @@ Milvus过滤表达式语法规则：
 
 示例：
 - 用户："查找标题包含成都招聘的文档" → title like "%成都招聘%"
-- 用户："查找学历要求是本科及以上或硕士及以上的文档" → job_edu in ["本科及以上", "硕士及以上"]
-# - 用户："查找2024年8月发布的文档" → pubDate like "2024.08%"
-- 用户："查找标题包含成都招聘且学历要求不是博士研究生的文档" → title like "%成都招聘%" and job_edu != "博士"
-- 用户："查找学历要求是博士的文档" → job_edu == "博士"
-- 用户："查找最低月薪大于20K的内容" → salary_min > 20 and salary_unit == "月"
+- 用户："查找学历要求是本科及以上的文档" → edu_level >= 1
+- 用户："查找标题包含成都招聘且学历要求不是博士研究生的文档" → title like "%成都招聘%" and edu_level != 3
+- 用户："查找学历要求是博士的文档" → edu_level >= 3
+- 用户："查找最低月薪大于20K的内容" → salary_min > 20000 and salary_unit == "月"
 - 用户："查找薪资面议的文档" → job_salary == "面议" and salary_unit == "面议"
 
 请只返回过滤表达式，不要包含其他解释。如果无法生成有效表达式，返回空字符串。"""
@@ -130,7 +129,7 @@ Milvus过滤表达式语法规则：
                 logger.debug(f"正在生成过滤表达式 (尝试 {attempt + 1}/{max_retries})")
 
                 response = self.openai_client.chat.completions.create(
-                    model=os.getenv("LLM_MODEL", "gpt-4o-mini"),
+                    model=os.getenv("LLM_MODEL", "qwen-turbo"),
                     messages=[
                         {"role": "system", "content": self._get_system_prompt()},
                         {"role": "user", "content": f"用户查询：{user_query}"}

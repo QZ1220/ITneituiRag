@@ -24,7 +24,7 @@ async def run():
             #     file.write(str(tools))
 
             # 工具功能测试
-            result = await session.call_tool("search_documents",{"query_text":"python相关的高薪工作有哪些","filter_query":"学历要求是本科或者以上，月薪需要大约3万","search_type":"hybrid","limit":3})
+            result = await session.call_tool("search_documents",{"query_text":"python相关的高薪工作有哪些","filter_query":"学历要求是硕士或者以上，月薪需要大约1万","search_type":"hybrid","limit":3})
             print(f"Supported result:{result}")
 
 

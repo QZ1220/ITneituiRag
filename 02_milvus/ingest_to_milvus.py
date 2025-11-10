@@ -103,6 +103,12 @@ def parse_salary(salary_str: str) -> Tuple[Optional[float], Optional[float], str
         low = low * 10 / 12
         high = high * 10 / 12
         unit = "月"
+    if low is not None:
+        ## K转换为元，方便后续搜索
+        low=low*1000
+    if high is not None:
+        ## K转换为元，方便后续搜索
+        high=high*1000
     return low, high, unit
 
 # ----------------------------

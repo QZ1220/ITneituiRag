@@ -345,17 +345,41 @@ volumes:
 同样，使用`docker compose up -d` 命令启动即可。
 
 上述两个服务启动成功以后，再使用
-`python 01_backendServer.py` 命令启动后端服务。
+`python backendServer.py` 命令启动后端服务。
 控制台输出如下：
 
  ```
-INFO:     Started server process [8854]
+INFO:     Started server process [18138]
 INFO:     Waiting for application startup.
-/Users/wqz/PycharmProjects/RagWithMilvusTest/04_ReActAgentRagWithMilvusTest/01_backendServer.py:644: LangGraphDeprecatedSinceV10: create_react_agent has been moved to `langchain.agents`. Please update your import to `from langchain.agents import create_agent`. Deprecated in LangGraph V1.0 to be removed in V2.0.
+/Users/wqz/PycharmProjects/ITneituiRag/04_rag/backendServer.py:644: LangGraphDeprecatedSinceV10: create_react_agent has been moved to `langchain.agents`. Please update your import to `from langchain.agents import create_agent`. Deprecated in LangGraph V1.0 to be removed in V2.0.
   app.state.agent = create_react_agent(
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
 ```
+
+如果执行`python backendServer.py`命令报错：
+ ```
+Traceback (most recent call last):
+  File "/Users/wqz/PycharmProjects/ITneituiRag/04_rag/backendServer.py", line 11, in <module>
+    from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+  File "/Users/wqz/miniforge3/envs/ITneituiRag/lib/python3.11/site-packages/langgraph/checkpoint/postgres/__init__.py", line 20, in <module>
+    from psycopg import Capabilities, Connection, Cursor, Pipeline
+  File "/Users/wqz/miniforge3/envs/ITneituiRag/lib/python3.11/site-packages/psycopg/__init__.py", line 9, in <module>
+    from . import pq  # noqa: F401 import early to stabilize side effects
+    ^^^^^^^^^^^^^^^^
+  File "/Users/wqz/miniforge3/envs/ITneituiRag/lib/python3.11/site-packages/psycopg/pq/__init__.py", line 116, in <module>
+    import_from_libpq()
+  File "/Users/wqz/miniforge3/envs/ITneituiRag/lib/python3.11/site-packages/psycopg/pq/__init__.py", line 108, in import_from_libpq
+    raise ImportError(
+ImportError: no pq wrapper available.
+Attempts made:
+- couldn't import psycopg 'c' implementation: No module named 'psycopg_c'
+- couldn't import psycopg 'binary' implementation: No module named 'psycopg_binary'
+- couldn't import psycopg 'python' implementation: libpq library not found
+```
+执行：pip install "psycopg[binary]"  即可解决
+
+
 
 ## 启动rag并执行查询逻辑
 
@@ -376,3 +400,24 @@ INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
 
 请输入您的问题 (输入 'exit' 退出，输入 'status' 查询状态，输入 'new' 开始新会话，输入 'history' 恢复历史会话，输入 'setting' 偏好设置) (你好):
 ```
+尝试执行提问测试一下，输入问题：使用rag_mcp_server工具查询月薪大于3万的工作，结果如下图所示：
+![rag_low_rank_resp](img/rag_low_rank_resp.png)
+
+从结果来看，可以发现结果并不好，查看`streamableHttpStart.py`的执行日志，可以看到：
+![mcp_log](img/mcp_log.png)
+
+这里我们使用的千问的模型，并不是gpt模型，直接修改`mixTextSearch.py`文件的`generate_filter_expression`方法，将模型换成`qwen-turbo`
+
+另外，优化prompt模板内容，如：
+```
+- 用户："查找学历要求是博士的文档" → job_edu == "博士"
+- 用户："查找最低月薪大于20K的内容" → salary_min > 20 and salary_unit == "月"
+```
+替换成
+```
+- 用户："查找学历要求是博士的文档" → edu_level >= 3
+- 用户："查找最低月薪大于20K的内容" → salary_min > 20000 and salary_unit == "月"
+```
+
+再次问下同样的问题效果会好很多:
+![rag_better_rank_resp](img/rag_better_rank_resp.png)
