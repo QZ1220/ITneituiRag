@@ -1,0 +1,321 @@
+{
+  "name": "招聘信息获取工作流",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -592,
+        400
+      ],
+      "id": "8424d9c9-2505-467b-93e5-2482cabbd097",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=./n8ndata/jobs.json",
+        "options": {
+          "append": false
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1824,
+        208
+      ],
+      "id": "7d79a4d0-c875-47db-afac-6a30641d9c34",
+      "name": "Read/Write Files from Disk",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        912,
+        384
+      ],
+      "id": "d598e833-5e6a-49a5-8df3-65760ddb35cc",
+      "name": "Loop Over Items",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1360,
+        272
+      ],
+      "id": "2514419a-d7b3-422c-81b7-679a6513010b",
+      "name": "Convert to File1",
+      "executeOnce": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f09a15e4-8637-4d43-ae2d-81437e946f89",
+              "leftValue": "={{ new Date($json.pubDate).getTime() }}",
+              "rightValue": "={{ Date.now() - 7*24 * 3600 * 1000 }}",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        16
+      ],
+      "id": "3942a6c0-fddf-421a-a680-9a12b5a1d8d7",
+      "name": "筛选文章时间",
+      "notesInFlow": true,
+      "notes": "保留7*24小时内的文章\n"
+    },
+    {
+      "parameters": {
+        "url": "https://5b9e2f7a8bd0.ngrok-free.app/feeds/MP_WXS_3926874534",
+        "options": {
+          "ignoreSSL": true
+        }
+      },
+      "id": "c4699c0a-1d97-49cc-89f8-411ff2ceb7c3",
+      "name": "成都-IT内推圈",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "position": [
+        -304,
+        16
+      ],
+      "typeVersion": 1.1,
+      "notesInFlow": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7d17ff53-9f4a-4ca6-a98e-52ba6408161f",
+              "name": "link",
+              "value": "={{ $json.link }}",
+              "type": "string"
+            },
+            {
+              "id": "11846c8e-1f42-4009-a760-14b80bcbba35",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "619fc889-4ae8-4d11-b495-fd3f69a88b81",
+              "name": "pubDate",
+              "value": "={{ $json.pubDate }}",
+              "type": "string"
+            },
+            {
+              "id": "ff8b61a9-3c58-4255-bc27-4e8370d53b4c",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "6f692aa4-5261-4299-8815-61040d92c0a6",
+              "name": "isoDate",
+              "value": "={{ $json.isoDate }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "46463d27-3c28-4e6c-9f45-cf4bc0cd8077",
+      "name": "字段提取"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://ea1c66f415c6.ngrok-free.app/content",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"url\": \"{{ $json.link }}\",\n  \"userAgent\": \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36\",\n  \"viewport\": {\n    \"width\": 1920,\n    \"height\": 1080\n  }\n}",
+        "options": {
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1312,
+        432
+      ],
+      "id": "e059ca14-d857-4784-9256-b04c1eb4702e",
+      "name": "HTTP Request",
+      "notesInFlow": false,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "import re\nimport json\nimport html\nfrom bs4 import BeautifulSoup\n\ndef preprocess_html_content(html_content):\n    \"\"\"\n    预处理HTML内容，去除无效的HTML相关字符和换行符\n    \"\"\"\n    # 1. 解码HTML实体字符\n    processed_content = html.unescape(html_content)\n\n    # 2. 去除多余的转义字符\n    processed_content = processed_content.replace('\\\\\\\\', '\\\\')\n\n    # 3. 去除控制字符（除了常见的换行符、制表符等）\n    processed_content = re.sub(r'[\\x00-\\x08\\x0b\\x0c\\x0e-\\x1f\\x7f]', '', processed_content)\n\n    # 4. 修复不完整的HTML实体\n    processed_content = re.sub(r'&([a-zA-Z]+);?', r'&\\1;', processed_content)\n\n    # 5. 特别处理换行符问题 - 将 \\n 替换为空字符串\n    processed_content = processed_content.replace('\\\\n', '')\n\n    # 6. 清理多余的空白字符（可选）\n    processed_content = re.sub(r'\\s+', ' ', processed_content).strip()\n\n    return processed_content\n\n\ndef clean_html_tags(html_content):\n    \"\"\"\n    清理HTML标签中的异常字符\n    \"\"\"\n    # 修复不正常的引号\n    html_content = re.sub(r'\\\\\\\"', '\"', html_content)\n    html_content = re.sub(r\"\\\\'\", \"'\", html_content)\n\n    # 删除<script>标签及其所有内容\n    html_content = re.sub(r'<script[^>]*>.*?</script>', '', html_content, flags=re.DOTALL)\n\n    return html_content\n\ndef parse_html_content(html_content):\n    \"\"\"\n    解析HTML内容，提取特定信息\n    \"\"\"\n\n    # 解析HTML内容，提取招聘名称等信息\n    soup = BeautifulSoup(html_content, 'html.parser')\n    meta_tag = soup.find('meta', property='og:title')\n    title = meta_tag.get('content') if meta_tag else \"\"\n\n    # 解析HTML内容，提取招聘原始链接信息\n    soup = BeautifulSoup(html_content, 'html.parser')\n    meta_tag = soup.find('meta', property='og:url')\n    origin_url = meta_tag.get('content') if meta_tag else \"\"\n\n    span_tags = soup.select('span[leaf]')  # 查找具有leaf属性的span标签\n    ## 定义一个空数组，名称为job_names\n    job_names = []\n    for tag in span_tags:\n        text = tag.get_text().strip()\n        ## text不为空且以「人）」或者「若干」作为结尾\n        text = text.strip()\n        if text and text.endswith(('人）', '若干')):\n            print(text)\n            job_names.append(text)\n\n    ## 提取薪资和学历信息\n    salary_edu_spans = soup.find_all('span', attrs={'leaf': True})\n    job_salaries = []\n    job_edu = []\n    for span in salary_edu_spans:\n        text = span.get_text().strip()\n        text = ' '.join(text.split())  # 清理多余空白\n\n        # 检查是否包含薪资和学历信息\n        if ('w/年' in text or 'k/月' in text or '面议' in text or 'w/月' in text) and (\n                '硕士' in text or '博士' in text or '本科' in text):\n            # 分割薪资和学历信息\n            parts = text.split()\n            if len(parts) >= 2:\n                job_salaries.append(parts[0])\n                job_edu.append(parts[1])\n\n    # 组合结果\n    # 为了合理组合数据，我们假设这些信息在文档中是按顺序出现的\n    # 取前三项非空结果进行组合（避免过多无效匹配）\n    job_details = []\n    max_items = max(len(job_names), len(job_salaries), len(job_edu), 3)\n\n    for i in range(min(max_items, max(len(job_names), len(job_salaries), len(job_edu)))):\n        job_detail = {\n            \"jobName\": job_names[i] if i < len(job_names) else \"\",\n            \"jobSalary\": job_salaries[i] if i < len(job_salaries) else \"\",\n            \"jobEdu\": job_edu[i] if i < len(job_edu) else \"\",\n            \"jobUrl\": origin_url\n        }\n        job_details.append(job_detail)\n\n    result = {\n        \"title\": title,\n        \"jobDetails\": job_details\n    }\n\n    return result\n\nfor item in items:\n    response_data = item.json\n    html_content = response_data.get('data')  # 推荐使用 .get() 避免 KeyError\n\n    if not html_content:\n        print(\"跳过空数据项\")\n        continue\n\n    print(f\"处理 HTML 片段: {html_content[:100]}...\")  # 打印前100字符用于调试\n\n    # 预处理HTML内容\n    processed_content = preprocess_html_content(html_content)\n    cleaned_content = clean_html_tags(processed_content)\n    print(\"处理后文件大小:\", len(cleaned_content))\n          \n    # 解析内容\n    result = parse_html_content(cleaned_content)\n\n    # 容错：若未提取到任何职位信息，返回空结构\n    if not result.get(\"jobDetails\"):\n      result = {\"title\": \"\", \"jobDetails\": []}\n\n    # 返回结果\nreturn [{\"json\": result}]\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        432
+      ],
+      "id": "b8b9d8f9-9b04-4bb4-a370-a606fe30c323",
+      "name": "Code in Python (Beta)",
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "成都-IT内推圈",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Convert to File1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File1": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "筛选文章时间": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "成都-IT内推圈": {
+      "main": [
+        [
+          {
+            "node": "字段提取",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "字段提取": {
+      "main": [
+        [
+          {
+            "node": "筛选文章时间",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c302d0ef-5f74-4140-aabe-89c8311ea817",
+  "meta": {
+    "instanceId": "df9569654ac4dfd8236f245a0bdc55bd7bb64a31b7dab091a0c1bed477db7e18"
+  },
+  "id": "qWM7aMOvqVrlOH9w",
+  "tags": [
+    {
+      "createdAt": "2025-09-13T11:53:57.501Z",
+      "updatedAt": "2025-09-13T11:53:57.501Z",
+      "id": "FOcwdj6Tb5ddbHm1",
+      "name": "Enterprise"
+    }
+  ]
+}
