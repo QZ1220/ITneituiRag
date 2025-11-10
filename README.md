@@ -9,6 +9,11 @@
 整体业务流程如下图所示:             
 <img src="img/img.png" alt="" width="1200" />       
 
+# 依赖安装
+```
+ pip install -r requirements.txt
+```
+
 # docker本地运行n8n、browserless、wewe-rss，如下图所示：
 
 ![示例图](img/docker.png)

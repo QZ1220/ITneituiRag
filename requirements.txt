@@ -1,0 +1,11 @@
+openai
+pymilvus
+mcp
+langchain-openai
+langgraph
+langgraph-checkpoint-postgres
+concurrent-log-handler
+langchain-mcp-adapters
+fastapi
+rich
+redis
