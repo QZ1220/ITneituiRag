@@ -1,6 +1,17 @@
+[本项目参考自 南哥研习社 ，点击直达原项目地址](https://github.com/NanGePlus/RagWithMilvusTest)
+
+# 简介
+主要实现的功能:       
+(1)使用低代码平台N8N实现对多个微信公众号文章进行自动采集并保存到本地文件                               
+(2)使用主流的开源云原生向量数据库milvus将采集到的数据存储到知识库中并满足语义搜索、全文搜索及混合搜索                                    
+(3)将搜索功能封装为标准的MCP Server对外提供服务                               
+(4)大模型(Agent)使用搜索MCP Server进行内容搜索                      
+整体业务流程如下图所示:             
+<img src="img/img.png" alt="" width="1200" />       
+
 # docker本地运行n8n、browserless、wewe-rss，如下图所示：
 
-![示例图](imgocker.png)
+![示例图](img/docker.png)
 
 ## n8n启动命令
 
@@ -50,7 +61,7 @@ services:
 
 访问`http://localhost:4000`, 初次应该需要AUTH_CODE，这个在你启动wewe-rss容器时设置的密码，登录即可。
 然后需要登录一个微信账号，使用微信扫码登录即可。
-![微信登录](imgechat_read.png)
+![微信登录](img/wechat_read.png)
 ![公众号rss](img/gzh_rss.png)
 
 获取到下图中的地址，便于后面使用：
@@ -83,7 +94,7 @@ tunnels:
 
 访问`http://localhost:5678/workflow`, 创建工作流。具体内容见`招聘信息获取工作流.json`文件，可以直接导入到n8n的工作流直接使用。
 效果如下图所示：
-![工作流](imgobs_workflow.png)
+![工作流](img/jobs_workflow.png)
 
 注意![img.png](img/neitui_rss.png) 入参的url需要换成ngrok代理后的地址，替换为4000端口的地址：
 http://localhost:4000/dash/feeds/MP_WXS_3926874534
