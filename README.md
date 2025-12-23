@@ -92,7 +92,7 @@ tunnels:
     host_header: localhost
  ```
 
-使用ngrok start --all --log=stdout命令启动代理，--log=stdout非必须，只是为了方便查看一些启动日志，比如实际使用的配置文件的路径。
+使用`ngrok start --all --log=stdout`命令启动代理，--log=stdout非必须，只是为了方便查看一些启动日志，比如实际使用的配置文件的路径。
 ![ngrok](img/ngrok.png)
 
 ## 搭建工作流
@@ -383,8 +383,8 @@ Attempts made:
 
 ## 启动rag并执行查询逻辑
 
-代码 `02_frontendServer.py` 启动前端交互服务。
-启动服务命令为：`python 02_frontendServer.py`。
+代码 `frontendServer.py` 启动前端交互服务。
+启动服务命令为：`python frontendServer.py`。
 
 输出如下：
 
@@ -400,7 +400,7 @@ Attempts made:
 
 请输入您的问题 (输入 'exit' 退出，输入 'status' 查询状态，输入 'new' 开始新会话，输入 'history' 恢复历史会话，输入 'setting' 偏好设置) (你好):
 ```
-尝试执行提问测试一下，输入问题：使用rag_mcp_server工具查询月薪大于3万的工作，结果如下图所示：
+尝试执行提问测试一下，输入问题：使用search_documents工具查询月薪大于5万的工作，结果如下图所示：
 ![rag_low_rank_resp](img/rag_low_rank_resp.png)
 
 从结果来看，可以发现结果并不好，查看`streamableHttpStart.py`的执行日志，可以看到：

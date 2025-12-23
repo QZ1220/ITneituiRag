@@ -166,6 +166,9 @@ def preprocess_and_insert(
 
 
     for item in raw_data:
+        ## 如果title为空，则跳过该条数据
+        if not item.get("title"):
+            continue
         title = item["title"]
         for job in item["jobDetails"]:
             job_name = job["jobName"]
