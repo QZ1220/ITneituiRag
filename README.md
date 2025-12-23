@@ -421,3 +421,8 @@ Attempts made:
 
 再次问下同样的问题效果会好很多:
 ![rag_better_rank_resp](img/rag_better_rank_resp.png)
+
+
+完整的运行视频见这里：
+
+https://www.bilibili.com/video/BV1prB8BnEP7/?vd_source=d1530fb814268f770330143e24aaf1e6
